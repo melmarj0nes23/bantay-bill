@@ -1,4 +1,4 @@
-const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+const VAPID_PUBLIC_KEY = (import.meta as any).env.VITE_VAPID_PUBLIC_KEY;
 
 // Convert a base64 string to Uint8Array required by Push API
 function urlBase64ToUint8Array(base64String: string) {

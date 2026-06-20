@@ -18,7 +18,7 @@ export default function Bills() {
     triggerAddFlow, triggerEditFlow, handleToggleState, handleDeleteTrigger, triggerCallAI, filteredBills,
     searchQuery, setSearchQuery, categoryFilter, setCategoryFilter, statusFilter, setStatusFilter,
     aiTip, isGeneratingTip, calendarYear, calendarMonth, handlePrevMonth, handleNextMonth,
-    calendarCells, monthNames, getCategoryLabel, getStatusColor, userEmail, handleUpdatePreference, setUserProfile, handleExportCSV
+    calendarCells, monthNames, getCategoryLabel, getStatusColor, userEmail, handleUpdatePreference, setUserProfile, handleExportCSV, handleLoadDemoData, isGeneratingDemo
   } = useAppContext();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -94,7 +94,17 @@ export default function Bills() {
                       {filteredBills.length === 0 ? (
                         <div className="text-center py-16 text-slate-400 text-xs flex flex-col items-center justify-center">
                           <Receipt className="w-12 h-12 mb-3 text-slate-200" />
-                          No bills match the selected parameters.
+                          <p className="mb-4">No bills match the selected parameters.</p>
+                          {bills.length === 0 && (
+                            <button 
+                              onClick={handleLoadDemoData}
+                              disabled={isGeneratingDemo}
+                              className="bg-emerald-50 text-[#005d42] border border-[#005d42]/20 hover:bg-emerald-100 font-bold px-4 py-2 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50"
+                            >
+                              <Sparkles className="w-4 h-4" />
+                              {isGeneratingDemo ? "Generating..." : "Load Demo Data"}
+                            </button>
+                          )}
                         </div>
                       ) : (
                         <div className="overflow-x-auto">

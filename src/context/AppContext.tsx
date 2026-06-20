@@ -4,6 +4,8 @@ import { Bill, UserProfile } from '../types';
 export interface AppContextType {
   filteredBills: Bill[];
   handleExportCSV: () => void;
+  handleLoadDemoData: () => Promise<void>;
+  isGeneratingDemo: boolean;
   bills: Bill[];
   userProfile: UserProfile;
   stats: any;

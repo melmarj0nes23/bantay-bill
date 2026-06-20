@@ -20,7 +20,7 @@ export default function Dashboard() {
     searchQuery, setSearchQuery, categoryFilter, setCategoryFilter, statusFilter, setStatusFilter,
     aiTip, isGeneratingTip, calendarYear, calendarMonth, handlePrevMonth, handleNextMonth,
     calendarCells, monthNames, getCategoryLabel, getStatusColor, userEmail, handleUpdatePreference, setUserProfile
-  } = useAppContext();
+  , handleLoadDemoData, isGeneratingDemo } = useAppContext();
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date();
