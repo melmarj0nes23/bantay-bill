@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #005d42;
+  --color-primary-container: #047857;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #9ffdd3;
+  --color-secondary: #1b6b51;
+  --color-secondary-container: #a6f2d1;
+  --color-on-secondary-container: #237157;
+  --color-tertiary: #863933;
+  --color-tertiary-container: #a45049;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-outline: #6e7a73;
+  --color-outline-variant: #bdc9c1;
+  --color-surface-variant: #dfe4df;
+  --color-on-surface-variant: #3e4943;
+  --color-surface-container-low: #f0f5f0;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #e5e9e4;
+  --color-surface-bright: #f6fbf5;
+}
+
+/* Custom calendar layout and utility styles from mock code */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: #E5E7EB; /* outline color for borders */
+    border-top: 1px solid #E5E7EB;
+    border-left: 1px solid #E5E7EB;
+}
+.calendar-cell {
+    background-color: #ffffff;
+    min-height: 110px;
+    padding: 8px;
+    border-right: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E7EB;
+    transition: background-color 0.15s ease;
+}
+.calendar-cell:hover {
+    background-color: #F8F9FB;
+}
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: 500;
+    color: #6e7a73;
+    padding-bottom: 12px;
+}
+.bill-indicator {
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.bill-paid { background-color: #e6f4ea; color: #137333; border: 1px solid #b7e1cd; }
+.bill-due-soon { background-color: #fef7e0; color: #b06000; border: 1px solid #fce8b2; }
+.bill-overdue { background-color: #fce8e6; color: #c5221f; border: 1px solid #f9c2c2; }
+.bill-upcoming { background-color: #f1f3f4; color: #5f6368; border: 1px solid #dadce0; }
+
+/* Custom scrollbar for smooth design */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
