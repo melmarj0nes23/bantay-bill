@@ -214,7 +214,7 @@ export default function App() {
 
   // Notifications Log
   const [logs, setLogs] = useState<string[]>([
-    "Welcome to BantayBill. Connected securely to Firestore.",
+    "Welcome to BantayBills. Connected securely to Firestore.",
     "Click Generate Tips to audit utility patterns."
   ]);
 
@@ -255,7 +255,7 @@ export default function App() {
             const isBalutpAdmin = user.email && user.email.toLowerCase() === 'balutp6@gmail.com';
             const initialProfile: UserProfile = {
               fullName: user.displayName || nameInput || (isBalutpAdmin ? 'Balut Admin' : 'Guest user'),
-              email: user.email || 'guest@bantaybill.com',
+              email: user.email || 'guest@bantaybills.com',
               currency: 'PHP',
               billingCycleStart: '1',
               twoFactorAuth: false,
@@ -392,7 +392,7 @@ export default function App() {
       const isBalutpAdmin = user.email && user.email.toLowerCase() === 'balutp6@gmail.com';
       const initialProfile: UserProfile = {
         fullName: nameInput || (isBalutpAdmin ? 'Balut Admin' : 'Guest user'),
-        email: user.email || 'guest@bantaybill.com',
+        email: user.email || 'guest@bantaybills.com',
         currency: 'PHP',
         billingCycleStart: '1',
         twoFactorAuth: false,
@@ -556,7 +556,7 @@ export default function App() {
         setAiTip(`Analyzed ${bills.length} bills. Review subscriptions like Spotify or Globe fiber to trim excess spend.`);
       }
     } catch (error) {
-      setAiTip(`BantayBill Smart Suggestion: Your current water utilities tracking has settled nicely. By bundling internet plan with your dynamic rent cycle, you can save ₱350/mo. Avoid premium streaming redundancies.`);
+      setAiTip(`BantayBills Smart Suggestion: Your current water utilities tracking has settled nicely. By bundling internet plan with your dynamic rent cycle, you can save ₱350/mo. Avoid premium streaming redundancies.`);
     } finally {
       setIsGeneratingTip(false);
     }
@@ -626,7 +626,7 @@ export default function App() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `bantaybill_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", `bantaybills_export_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -644,7 +644,7 @@ export default function App() {
                 <div className="w-10 h-10 rounded-full bg-[#047857] flex items-center justify-center text-white">
                   <CreditCard className="w-5 h-5" />
                 </div>
-                <span className="font-bold text-2xl text-[#005d42] tracking-tight font-dashboard-title">BantayBill</span>
+                <span className="font-bold text-2xl text-[#005d42] tracking-tight font-dashboard-title">BantayBills</span>
               </div>
               <div className="flex items-center space-x-4">
                 <button 
@@ -726,9 +726,9 @@ export default function App() {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="flex items-center gap-2">
                 <CreditCard className="w-6 h-6 text-emerald-400" />
-                <span className="font-bold text-xl text-white">BantayBill</span>
+                <span className="font-bold text-xl text-white">BantayBills</span>
               </div>
-              <p className="text-xs">&copy; 2026 BantayBill. Premium Bill Management.</p>
+              <p className="text-xs">&copy; 2026 BantayBills. Premium Bill Management.</p>
             </div>
           </footer>
         </div>
@@ -742,7 +742,7 @@ export default function App() {
               <div className="h-12 w-12 bg-[#047857] rounded-lg flex items-center justify-center text-white mb-3">
                 <Receipt className="w-6 h-6" />
               </div>
-              <h1 className="font-bold text-3xl font-dashboard-title text-[#005d42] tracking-tight">BantayBill</h1>
+              <h1 className="font-bold text-3xl font-dashboard-title text-[#005d42] tracking-tight">BantayBills</h1>
               <h2 className="text-[#181d1a] font-medium text-lg mt-2 font-semibold">Welcome back</h2>
             </header>
 
@@ -810,7 +810,7 @@ export default function App() {
               <div className="h-10 w-10 bg-primary-container rounded-full flex items-center justify-center text-white mb-3">
                 <UserPlus className="w-5 h-5" />
               </div>
-              <h1 className="font-bold text-3xl font-dashboard-title text-[#005d42] tracking-tight">BantayBill</h1>
+              <h1 className="font-bold text-3xl font-dashboard-title text-[#005d42] tracking-tight">BantayBills</h1>
               <h2 className="text-[#181d1a] font-medium text-lg mt-1 font-semibold">Create account</h2>
             </header>
 
@@ -892,7 +892,7 @@ export default function App() {
                 <CreditCard className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="font-semibold text-xl text-[#005d42] font-dashboard-title leading-none">BantayBill</h1>
+                <h1 className="font-semibold text-xl text-[#005d42] font-dashboard-title leading-none">BantayBills</h1>
                 <p className="text-[10px] text-[#3e4943] font-mono tracking-wider uppercase mt-1">Premium Bill Console</p>
               </div>
             </div>
@@ -985,7 +985,7 @@ export default function App() {
                 >
                   <Menu className="w-6 h-6 text-[#181d1a]" />
                 </button>
-                <h1 className="text-lg font-bold font-dashboard-title text-primary block md:hidden">BantayBill</h1>
+                <h1 className="text-lg font-bold font-dashboard-title text-primary block md:hidden">BantayBills</h1>
                 <div className="hidden lg:flex items-center w-64 bg-slate-50 border border-[#ebefea] rounded-full px-4 py-2 text-sm focus-within:border-[#047857] focus-within:ring-2 focus-within:ring-[#047857]/15 transition-all">
                   <Search className="w-4 h-4 text-slate-400 mr-2" />
                   <input 

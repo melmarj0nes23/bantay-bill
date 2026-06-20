@@ -20,7 +20,7 @@ const getGroqClient = () => {
   return new Groq({ apiKey: apiKey });
 };
 
-// Secure API endpoint proxy for BantayBill financial tips
+// Secure API endpoint proxy for BantayBills financial tips
 app.post('/api/insights', async (req, res) => {
   const { bills } = req.body;
   
@@ -40,7 +40,7 @@ app.post('/api/insights', async (req, res) => {
     
     const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const response = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: `You are BantayBill AI, a premium literal household financial advisor. Today's date is ${currentDate}. Analyze this member's current bills:\n${formattedBills}\n\nProvide exactly ONE paragraph containing actionable advice, utilities audit, and subscriptions tips under 50 words. Avoid self-praising or flowery jargon. Speak with professional composure.` }],
+      messages: [{ role: 'user', content: `You are BantayBills AI, a premium literal household financial advisor. Today's date is ${currentDate}. Analyze this member's current bills:\n${formattedBills}\n\nProvide exactly ONE paragraph containing actionable advice, utilities audit, and subscriptions tips under 50 words. Avoid self-praising or flowery jargon. Speak with professional composure.` }],
       model: 'llama-3.1-8b-instant',
     });
 
@@ -72,7 +72,7 @@ const startServer = async () => {
   }
 
   app.listen(port, '0.0.0.0', () => {
-    console.log(`BantayBill full-stack server running successfully on port ${port}`);
+    console.log(`BantayBills full-stack server running successfully on port ${port}`);
   });
 };
 

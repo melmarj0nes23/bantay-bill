@@ -8,7 +8,7 @@ self.addEventListener('push', function(event) {
     }
   }
   
-  const title = data.title || 'BantayBill Reminder';
+  const title = data.title || 'BantayBills Reminder';
   const options = {
     body: data.body || 'You have an upcoming bill.',
     icon: '/vite.svg',

@@ -1,5 +1,5 @@
 {
-  "name": "BantayBill",
+  "name": "BantayBills",
   "description": "Premium bill management system that helps you keep track of utilities, subscriptions, and recurring bills. Includes calendar views, detailed cost analysis, interactive settings, and AI-powered observations.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
