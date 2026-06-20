@@ -716,7 +716,7 @@ export default function App() {
       {/* ---------------- 1. LANDING MAIN PROMO PAGE ---------------- */}
       {currentPage === 'landing' && (
         <div className="flex flex-col min-h-screen bg-[#f6fbf5]">
-          <nav className="sticky top-0 z-50 w-full bg-[#f6fbf5]/80 backdrop-blur-md border-b border-[#bdc9c1] h-16 flex items-center">
+          <nav className="fixed top-0 z-50 w-full bg-[#f6fbf5]/90 backdrop-blur-md border-b border-[#bdc9c1] h-16 flex items-center shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-[#047857] flex items-center justify-center text-white">
@@ -737,7 +737,7 @@ export default function App() {
 
           <main className="flex-1">
             {/* Elegant Hero Section */}
-            <section className="relative pt-20 pb-24 md:pt-28 md:pb-36 px-6 overflow-hidden">
+            <section className="relative min-h-[100dvh] flex flex-col justify-center pt-24 pb-16 px-6 overflow-hidden">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#8bd6b6]/15 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
               <div className="max-w-4xl mx-auto text-center relative z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f0f5f0] border border-[#bdc9c1] mb-6">
