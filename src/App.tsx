@@ -56,7 +56,9 @@ import {
   signInAnonymously,
   updateProfile
 } from 'firebase/auth';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { loadDemoData } from './utils/demoData';
 import { Bill, UserProfile } from './types';
 import { 
   subscribeToProfile, 
@@ -437,18 +439,35 @@ export default function App() {
     }
   };
 
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+
   const handleBypassGuestAccess = async () => {
     setErrorMsg('');
+    setIsDemoLoading(true);
     try {
-      await signInAnonymously(auth);
+      const cred = await signInAnonymously(auth);
+      const user = cred.user;
+      
+      // Check if this anonymous user already has bills
+      const billsRef = collection(db, 'bills');
+      const q = query(billsRef, where('userId', '==', user.uid), limit(1));
+      const querySnapshot = await getDocs(q);
+      
+      // If no bills exist, inject demo data immediately
+      if (querySnapshot.empty) {
+        await loadDemoData(user.uid);
+      }
     } catch (err: any) {
       setErrorMsg(err.message || 'Guest access currently limited');
+    } finally {
+      setIsDemoLoading(false);
     }
   };
 
   const handleSingoutTrigger = async () => {
     await signOut(auth);
     setCurrentPage('landing');
+    navigate('/');
   };
 
   // Add & Edit actions
@@ -735,10 +754,11 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <button 
                     onClick={handleBypassGuestAccess}
-                    className="w-full sm:w-auto bg-[#047857] text-white hover:bg-[#065F46] shadow-md transition-all duration-150 px-8 py-4 rounded-xl font-medium text-base flex items-center justify-center gap-2 animate-bounce-subtle"
+                    disabled={isDemoLoading}
+                    className="w-full sm:w-auto bg-[#047857] text-white hover:bg-[#065F46] shadow-md transition-all duration-150 px-8 py-4 rounded-xl font-medium text-base flex items-center justify-center gap-2 disabled:opacity-70 disabled:animate-pulse"
                   >
-                    Try Demo Now
-                    <ArrowRight className="w-5 h-5" />
+                    {isDemoLoading ? "Loading Workspace..." : "Try Demo Now"}
+                    {!isDemoLoading && <ArrowRight className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
@@ -950,9 +970,12 @@ export default function App() {
               <div className="w-10 h-10 rounded-full bg-[#047857] flex items-center justify-center text-white">
                 <CreditCard className="w-5 h-5" />
               </div>
-              <div>
+              <div 
+                className="cursor-pointer hover:opacity-80 transition-opacity" 
+                onClick={() => { setCurrentPage('landing'); navigate('/'); }}
+              >
                 <h1 className="font-semibold text-xl text-[#005d42] font-dashboard-title leading-none">BantayBills</h1>
-                <p className="text-[10px] text-[#3e4943] font-mono tracking-wider uppercase mt-1">Premium Bill Console</p>
+                <p className="text-[10px] text-[#3e4943] font-mono tracking-wider uppercase mt-1">Premium Bill Manager</p>
               </div>
             </div>
 
