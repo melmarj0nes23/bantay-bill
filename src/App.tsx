@@ -965,7 +965,7 @@ export default function App() {
         <div className="h-screen flex overflow-hidden">
           
           {/* Permanent Desktop + Collapsible Mobile Sidebar */}
-          <nav className={`h-screen w-64 bg-white border-r border-[#bdc9c1] flex flex-col py-6 px-4 z-40 fixed left-0 top-0 transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:block'}`}>
+          <nav className={`h-[100dvh] w-64 bg-white border-r border-[#bdc9c1] flex flex-col pt-6 pb-24 px-4 z-40 fixed left-0 top-0 overflow-y-auto transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:block'}`}>
             <div className="mb-8 px-2 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#047857] flex items-center justify-center text-white">
                 <CreditCard className="w-5 h-5" />
