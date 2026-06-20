@@ -50,12 +50,14 @@ export default function Calendar() {
                     <div className="bg-white rounded-xl border border-[#bdc9c1] overflow-hidden shadow-xs">
                       <div className="p-4">
                         
-                        {/* Weekly headers */}
-                        <div className="grid grid-cols-7 text-center font-bold text-xs text-slate-500 uppercase tracking-widest pb-3 border-b border-slate-100">
-                          <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                        </div>
+                        <div className="overflow-x-auto">
+                          <div className="min-w-[700px]">
+                            {/* Weekly headers */}
+                            <div className="grid grid-cols-7 text-center font-bold text-xs text-slate-500 uppercase tracking-widest pb-3 border-b border-slate-100">
+                              <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                            </div>
 
-                        {/* Cells Grid */}
+                            {/* Cells Grid */}
                         <div className="grid grid-cols-7 gap-px bg-slate-200 mt-2">
                           {calendarCells.map((cell, idx) => (
                             <div 
@@ -94,6 +96,8 @@ export default function Calendar() {
                               </div>
                             </div>
                           ))}
+                        </div>
+                          </div>
                         </div>
                       </div>
                     </div>

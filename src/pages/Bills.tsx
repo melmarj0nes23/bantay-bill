@@ -108,7 +108,7 @@ export default function Bills() {
                         </div>
                       ) : (
                         <div className="overflow-x-auto">
-                          <table className="w-full text-left text-xs">
+                          <table className="w-full text-left text-xs whitespace-nowrap">
                             <thead>
                               <tr className="bg-slate-50 border-b border-[#ebefea] text-slate-400 font-semibold uppercase tracking-wider">
                                 <th className="py-3 px-4">Bill Name</th>

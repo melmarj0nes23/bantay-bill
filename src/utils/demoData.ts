@@ -89,6 +89,39 @@ export const loadDemoData = async (userId: string) => {
       recurring: false, frequency: "monthly",
       reminder: true, reminderDays: 3, notes: 'Demo Data: Annual comprehensive insurance.',
       paidMonths: []
+    },
+    {
+      name: 'Globe Mobile',
+      amount: 1299,
+      dueDate: getRelativeDate(8),
+      category: 'internet',
+      status: 'Paid',
+      recurring: true,
+      frequency: 'monthly',
+      reminder: true, reminderDays: 3, notes: 'Demo Data: Postpaid plan.',
+      paidMonths: [now.toISOString().substring(0, 7)]
+    },
+    {
+      name: 'Spotify Family',
+      amount: 214,
+      dueDate: getRelativeDate(15),
+      category: 'other',
+      status: 'Upcoming',
+      recurring: true,
+      frequency: 'monthly',
+      reminder: false, reminderDays: 3, notes: 'Demo Data: Music streaming.',
+      paidMonths: []
+    },
+    {
+      name: 'Credit Card (BPI)',
+      amount: 5500,
+      dueDate: getRelativeDate(-5),
+      category: 'other',
+      status: 'Overdue',
+      recurring: true,
+      frequency: 'monthly',
+      reminder: true, reminderDays: 5, notes: 'Demo Data: Monthly statement balance.',
+      paidMonths: []
     }
   ];
 

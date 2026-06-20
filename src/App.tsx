@@ -717,7 +717,7 @@ export default function App() {
       {currentPage === 'landing' && (
         <div className="flex flex-col min-h-screen bg-[#f6fbf5]">
           <nav className="sticky top-0 z-50 w-full bg-[#f6fbf5]/80 backdrop-blur-md border-b border-[#bdc9c1] h-16 flex items-center">
-            <div className="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-[#047857] flex items-center justify-center text-white">
                   <CreditCard className="w-5 h-5" />
@@ -755,10 +755,10 @@ export default function App() {
                   <button 
                     onClick={handleBypassGuestAccess}
                     disabled={isDemoLoading}
-                    className="w-full sm:w-auto bg-[#047857] text-white hover:bg-[#065F46] shadow-md transition-all duration-150 px-8 py-4 rounded-xl font-medium text-base flex items-center justify-center gap-2 disabled:opacity-70 disabled:animate-pulse"
+                    className="w-full sm:w-auto bg-[#047857] text-white hover:bg-[#065F46] shadow-md transition-all duration-150 px-4 sm:px-8 py-3 sm:py-4 rounded-xl font-medium text-sm sm:text-base flex items-center justify-center gap-2 disabled:opacity-70 disabled:animate-pulse whitespace-nowrap"
                   >
                     {isDemoLoading ? "Loading Workspace..." : "Try Demo Now"}
-                    {!isDemoLoading && <ArrowRight className="w-5 h-5" />}
+                    {!isDemoLoading && <ArrowRight className="hidden sm:block w-5 h-5" />}
                   </button>
                 </div>
               </div>
