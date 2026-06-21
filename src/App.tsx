@@ -1034,7 +1034,7 @@ export default function App() {
 
       {/* ---------------- 4. MAIN CLOUD APPLICATION WORKSPACE ---------------- */}
       {currentPage === 'app' && (
-        <div className="h-screen flex overflow-hidden">
+        <div className="h-[100dvh] flex overflow-hidden">
           
           {/* Permanent Desktop + Collapsible Mobile Sidebar */}
           <nav className={`h-[100dvh] w-64 bg-white border-r border-[#bdc9c1] flex flex-col pt-6 pb-24 px-4 z-40 fixed left-0 top-0 overflow-y-auto transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:block'}`}>
@@ -1120,7 +1120,7 @@ export default function App() {
           )}
 
           {/* Main workspace frame viewport */}
-          <div className="flex-1 flex flex-col md:pl-64 w-full h-screen overflow-hidden">
+          <div className="flex-1 flex flex-col md:pl-64 w-full h-[100dvh] overflow-hidden">
             
             {/* Header section with real-time status */}
             <header className="h-16 w-full px-6 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-[#ebefea] shrink-0 sticky top-0 z-30">
