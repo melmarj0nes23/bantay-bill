@@ -1,8 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import os
+
+def main():
+    content = """import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Receipt, ChevronDown, CheckCircle, Clock, 
-  Sparkles, RefreshCw, ChevronLeft, ChevronRight, Menu, Calendar as CalendarIcon,
+  Sparkles, RefreshCw, ChevronLeft, ChevronRight,
   Zap, Droplet, Wifi, Home, ShieldAlert, FileText, ArrowRight
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
@@ -359,3 +362,9 @@ export default function Dashboard() {
     </div>
   );
 }
+"""
+    with open("src/pages/Dashboard.tsx", "w") as f:
+        f.write(content)
+
+if __name__ == "__main__":
+    main()
