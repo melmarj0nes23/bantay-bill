@@ -214,7 +214,7 @@ export default function Dashboard() {
             
             <div className="flex-1 flex items-end justify-between ml-12 h-[120px] border-b border-slate-100 pb-1">
               {dailySpend.map((amount, idx) => (
-                <div key={idx} className="relative w-full flex justify-center group">
+                <div key={idx} className="relative w-full h-full flex items-end justify-center group">
                   {amount > 0 && (
                     <div 
                       className="w-[80%] max-w-[12px] bg-[#005d42] rounded-t-sm hover:bg-[#065F46] transition-colors cursor-pointer"
