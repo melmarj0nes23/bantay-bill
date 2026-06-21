@@ -85,14 +85,12 @@ export default function Dashboard() {
   const displayName = userName.charAt(0).toUpperCase() + userName.slice(1);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-12">
       
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-sm">
+      <div className="order-1 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-slate-200">
-             <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" className="w-full h-full object-cover" />
-          </div>
+
           <div>
             <h2 className="text-3xl font-black tracking-tight text-[#181d1a]">Dashboard</h2>
             <p className="text-sm font-semibold text-slate-500">Overview - Welcome Back, {displayName}!</p>
@@ -119,7 +117,7 @@ export default function Dashboard() {
       </div>
 
       {/* AI BANNER */}
-      <div className="bg-gradient-to-r from-[#005d42] to-[#047857] rounded-2xl p-4 shadow-lg text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="order-last md:order-2 bg-gradient-to-r from-[#005d42] to-[#047857] rounded-2xl p-4 shadow-lg text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white/20 rounded-full backdrop-blur-sm"><Sparkles className="w-5 h-5 text-yellow-300" /></div>
           <div>
@@ -138,7 +136,7 @@ export default function Dashboard() {
       </div>
 
       {/* STATS ROW */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="order-3 grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Total Spent */}
         <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all">
@@ -193,7 +191,7 @@ export default function Dashboard() {
       </div>
 
       {/* MIDDLE ROW */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="order-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Monthly Spending Bar Chart */}
         <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
@@ -287,7 +285,7 @@ export default function Dashboard() {
       </div>
 
       {/* RECENT & UPCOMING BILLS */}
-      <div>
+      <div className="order-5">
         <h3 className="font-bold text-lg text-slate-800 mb-4 px-2">Recent & Upcoming Bills</h3>
         <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
           
