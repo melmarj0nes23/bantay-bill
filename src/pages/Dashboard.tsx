@@ -13,7 +13,7 @@ export default function Dashboard() {
   const { 
     bills, userProfile, currencySymbol,
     triggerAddFlow, triggerEditFlow, handleToggleState, triggerCallAI,
-    aiTip, isGeneratingTip, calendarCells, getCategoryLabel
+    aiTip, isGeneratingTip, getCategoryLabel
   } = useAppContext();
 
   const [expandedBillId, setExpandedBillId] = useState<string | null>(null);
@@ -27,6 +27,34 @@ export default function Dashboard() {
       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     });
   }, [bills, selectedDate]);
+
+
+  const dashboardCalendarCells = useMemo(() => {
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth();
+    const days = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const cells: { day: number | null; dateString: string; billsOnThisDay: any[] }[] = [];
+
+    for (let i = 0; i < firstDay; i++) {
+      cells.push({ day: null, dateString: '', billsOnThisDay: [] });
+    }
+
+    for (let d = 1; d <= days; d++) {
+      const monthPart = (month + 1).toString().padStart(2, '0');
+      const dayPart = d.toString().padStart(2, '0');
+      const dateStringStr = `${year}-${monthPart}-${dayPart}`;
+      
+      const matchedBills = dashboardBills.filter(b => b.dueDate === dateStringStr);
+      cells.push({
+        day: d,
+        dateString: dateStringStr,
+        billsOnThisDay: matchedBills
+      });
+    }
+
+    return cells;
+  }, [selectedDate, dashboardBills]);
 
   const dashboardStats = useMemo(() => {
     return computeStats(dashboardBills);
@@ -248,8 +276,8 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-lg text-slate-800">Due Dates</h3>
             <div className="flex gap-1 text-slate-400">
-              <ChevronLeft className="w-4 h-4 cursor-pointer hover:text-slate-800" />
-              <ChevronRight className="w-4 h-4 cursor-pointer hover:text-slate-800" />
+              <ChevronLeft className="w-4 h-4 cursor-pointer hover:text-slate-800" onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1))} />
+              <ChevronRight className="w-4 h-4 cursor-pointer hover:text-slate-800" onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1))} />
             </div>
           </div>
           
@@ -258,7 +286,7 @@ export default function Dashboard() {
           </div>
           
           <div className="grid grid-cols-7 gap-y-2 text-center text-sm font-bold text-slate-700">
-            {calendarCells.map((cell, idx) => {
+            {dashboardCalendarCells.map((cell, idx) => {
               const hasBills = cell.billsOnThisDay.length > 0;
               const isToday = cell.day === new Date().getDate() && selectedDate.getMonth() === new Date().getMonth();
               return (
