@@ -782,14 +782,7 @@ export default function App() {
                   
                   {/* Social Proof */}
                   <div className="mt-10 flex flex-col items-center gap-3 animate-fade-in-up animation-delay-200">
-                    <div className="flex -space-x-3">
-                      <div className="w-10 h-10 rounded-full border-2 border-[#f6fbf5] bg-slate-200 overflow-hidden"><img src="https://i.pravatar.cc/100?img=1" alt="user" /></div>
-                      <div className="w-10 h-10 rounded-full border-2 border-[#f6fbf5] bg-slate-300 overflow-hidden"><img src="https://i.pravatar.cc/100?img=2" alt="user" /></div>
-                      <div className="w-10 h-10 rounded-full border-2 border-[#f6fbf5] bg-slate-400 overflow-hidden"><img src="https://i.pravatar.cc/100?img=3" alt="user" /></div>
-                      <div className="w-10 h-10 rounded-full border-2 border-[#f6fbf5] bg-slate-500 overflow-hidden"><img src="https://i.pravatar.cc/100?img=4" alt="user" /></div>
-                      <div className="w-10 h-10 rounded-full border-2 border-[#f6fbf5] bg-[#005d42] flex items-center justify-center text-white text-xs font-bold">+10k</div>
-                    </div>
-                    <p className="text-sm font-medium text-[#3e4943]">Join 10,000+ users tracking <span className="font-bold text-[#005d42]">₱50M+</span> in bills</p>
+                    <p className="text-sm font-medium text-[#3e4943]">Join our growing community and take control of your bills today!</p>
                   </div>
                 </div>
 
