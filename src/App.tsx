@@ -4,6 +4,8 @@ import { AppContext } from './context/AppContext';
 import Dashboard from './pages/Dashboard';
 import Bills from './pages/Bills';
 import Calendar from './pages/Calendar';
+import Disclaimer from './pages/Disclaimer';
+import Privacy from './pages/Privacy';
 import Insights from './pages/Insights';
 import { isBillDueOnDate, getBillsForMonth } from './utils/billCalculations';
 
@@ -153,7 +155,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
 
   // Router views
-  const [currentPage, setCurrentPage] = useState<'landing' | 'login' | 'register' | 'app'>('landing');
+  const [currentPage, setCurrentPage] = useState<'landing' | 'login' | 'register' | 'app' | 'privacy' | 'disclaimer'>('landing');
   const [currentTab, setCurrentTab] = useState<'dashboard' | 'bills' | 'calendar' | 'insights' | 'settings'>('dashboard');
 
   // Database States
@@ -874,16 +876,26 @@ export default function App() {
           </main>
 
           <footer className="bg-[#181d1a] text-[#dfe4df]/60 py-12 px-6">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="flex items-center gap-2">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-6 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-2">
                 <CreditCard className="w-6 h-6 text-emerald-400" />
                 <span className="font-bold text-xl text-white">BantayBills</span>
               </div>
-              <p className="text-xs">&copy; 2026 BantayBills. Premium Bill Management.</p>
+              
+              <p className="text-xs text-center">&copy; 2026 BantayBills. Premium Bill Management.</p>
+
+              <div className="flex gap-6 text-xs font-medium justify-center md:justify-end">
+                <button onClick={() => setCurrentPage('privacy')} className="hover:text-emerald-400 transition-colors">Privacy Policy</button>
+                <button onClick={() => setCurrentPage('disclaimer')} className="hover:text-emerald-400 transition-colors">Legal Disclaimer</button>
+              </div>
             </div>
           </footer>
         </div>
       )}
+
+      {/* ---------------- LEGAL PAGES ---------------- */}
+      {currentPage === 'disclaimer' && <Disclaimer onBack={() => setCurrentPage('landing')} />}
+      {currentPage === 'privacy' && <Privacy onBack={() => setCurrentPage('landing')} />}
 
       {/* ---------------- 2. SIGN IN PAGE ---------------- */}
       {currentPage === 'login' && (
