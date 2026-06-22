@@ -10,6 +10,7 @@ import Insights from './pages/Insights';
 import { isBillDueOnDate, getBillsForMonth } from './utils/billCalculations';
 
 import { 
+  ArrowLeft,
   CreditCard, 
   LayoutDashboard, 
   Receipt, 
@@ -438,7 +439,11 @@ export default function App() {
     try {
       await signInWithEmailAndPassword(auth, emailInput, passwordInput);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Login credentials incorrect');
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setErrorMsg('Incorrect Email or Password.');
+      } else {
+        setErrorMsg(err.message || 'Login credentials incorrect');
+      }
     }
   };
 
@@ -900,7 +905,13 @@ export default function App() {
       {/* ---------------- 2. SIGN IN PAGE ---------------- */}
       {currentPage === 'login' && (
         <div className="min-h-screen flex items-center justify-center p-6 bg-[#f0f5f0]">
-          <div className="w-full max-w-md bg-white border border-[#bdc9c1] rounded-xl p-8 shadow-sm">
+          <div className="w-full max-w-md bg-white border border-[#bdc9c1] rounded-xl p-8 shadow-sm relative">
+            <button 
+              onClick={() => setCurrentPage('landing')}
+              className="absolute top-6 left-6 text-slate-400 hover:text-[#047857] transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <header className="flex flex-col items-center mb-6 text-center">
               <div className="h-12 w-12 bg-[#047857] rounded-lg flex items-center justify-center text-white mb-3">
                 <Receipt className="w-6 h-6" />
@@ -968,7 +979,13 @@ export default function App() {
       {/* ---------------- 3. SIGN UP REGISTER PAGE ---------------- */}
       {currentPage === 'register' && (
         <div className="min-h-screen flex items-center justify-center p-6 bg-[#f0f5f0]">
-          <div className="w-full max-w-md bg-white border border-[#bdc9c1] rounded-xl p-8 shadow-sm">
+          <div className="w-full max-w-md bg-white border border-[#bdc9c1] rounded-xl p-8 shadow-sm relative">
+            <button 
+              onClick={() => setCurrentPage('landing')}
+              className="absolute top-6 left-6 text-slate-400 hover:text-[#047857] transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <header className="flex flex-col items-center mb-6 text-center">
               <div className="h-10 w-10 bg-primary-container rounded-full flex items-center justify-center text-white mb-3">
                 <UserPlus className="w-5 h-5" />
