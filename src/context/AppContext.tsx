@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { Bill, UserProfile } from '../types';
+import { Bill, Expense, UserProfile } from '../types';
 
 export interface AppContextType {
   filteredBills: Bill[];
@@ -7,6 +7,7 @@ export interface AppContextType {
   handleLoadDemoData: () => Promise<void>;
   isGeneratingDemo: boolean;
   bills: Bill[];
+  expenses: Expense[];
   userProfile: UserProfile;
   stats: any;
   currencySymbol: string;

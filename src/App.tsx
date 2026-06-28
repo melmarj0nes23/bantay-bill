@@ -6,12 +6,15 @@ import Bills from './pages/Bills';
 import Calendar from './pages/Calendar';
 import Disclaimer from './pages/Disclaimer';
 import Privacy from './pages/Privacy';
+import Expenses from './pages/Expenses';
 import Insights from './pages/Insights';
+import About from './pages/About';
+import WhatsNewModal from './components/WhatsNewModal';
 import { isBillDueOnDate, getBillsForMonth } from './utils/billCalculations';
 
 import { 
   ArrowLeft,
-  CreditCard, 
+  CreditCard, Wallet,
   LayoutDashboard, 
   Receipt, 
   Calendar as CalendarIcon, 
@@ -22,7 +25,8 @@ import {
   Search, 
   Bell, 
   HelpCircle, 
-  TrendingUp, 
+  TrendingUp,
+  Info, 
   CheckCircle, 
   AlertTriangle, 
   Clock, 
@@ -63,11 +67,12 @@ import {
 import { auth, db } from './firebase';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { loadDemoData } from './utils/demoData';
-import { Bill, UserProfile } from './types';
+import { Bill, Expense, UserProfile } from './types';
 import { 
   subscribeToProfile, 
   updateProfileInDb, 
-  subscribeToBills, 
+  subscribeToBills,
+  subscribeToExpenses,
   addBillInDb, 
   updateBillInDb, 
   deleteBillFromDb 
@@ -157,10 +162,11 @@ export default function App() {
 
   // Router views
   const [currentPage, setCurrentPage] = useState<'landing' | 'login' | 'register' | 'app' | 'privacy' | 'disclaimer'>('landing');
-  const [currentTab, setCurrentTab] = useState<'dashboard' | 'bills' | 'calendar' | 'insights' | 'settings'>('dashboard');
+  const [currentTab, setCurrentTab] = useState<'dashboard' | 'bills' | 'expenses' | 'calendar' | 'insights' | 'settings'>('dashboard');
 
   // Database States
   const [bills, setBills] = useState<Bill[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile>({
     fullName: 'Jane Doe',
     email: '',
@@ -197,6 +203,19 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [isGeneratingDemo, setIsGeneratingDemo] = useState(false);
+
+  const handleLoadDemoData = async () => {
+    if (!firebaseUser) return;
+    setIsGeneratingDemo(true);
+    try {
+      await loadDemoData(firebaseUser.uid);
+    } catch (err: any) {
+      console.error('Error loading demo data:', err);
+    } finally {
+      setIsGeneratingDemo(false);
+    }
+  };
 
   // AI intelligence outcomes state
   const [aiTip, setAiTip] = useState<string>('Your electricity utility has increased. Review usage and set reminders correctly.');
@@ -240,6 +259,7 @@ export default function App() {
   useEffect(() => {
     let cancelProfileSub: (() => void) | null = null;
     let cancelBillsSub: (() => void) | null = null;
+    let cancelExpensesSub: (() => void) | null = null;
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       // Clean up previous listeners if any exist
@@ -250,6 +270,10 @@ export default function App() {
       if (cancelBillsSub) {
         cancelBillsSub();
         cancelBillsSub = null;
+      }
+      if (cancelExpensesSub) {
+        cancelExpensesSub();
+        cancelExpensesSub = null;
       }
 
       setFirebaseUser(user);
@@ -296,6 +320,10 @@ export default function App() {
         cancelBillsSub = subscribeToBills(user.uid, (fetchedBills) => {
           setBills(fetchedBills);
         });
+
+        cancelExpensesSub = subscribeToExpenses(user.uid, (fetchedExpenses) => {
+          setExpenses(fetchedExpenses);
+        });
       } else {
         if (currentPage === 'app') {
           setCurrentPage('landing');
@@ -312,6 +340,9 @@ export default function App() {
       if (cancelBillsSub) {
         cancelBillsSub();
       }
+      if (cancelExpensesSub) {
+        cancelExpensesSub();
+      }
     };
   }, [nameInput]);
 
@@ -326,7 +357,7 @@ export default function App() {
     let paidVal = 0;
     let pendingVal = 0;
     let overdueVal = 0;
-    let totalCount = bills.length;
+    let totalCount = bills.length + expenses.length;
     let completedCount = 0;
 
     bills.forEach(bill => {
@@ -341,6 +372,11 @@ export default function App() {
       }
     });
 
+    expenses.forEach(exp => {
+      paidVal += exp.amount;
+      completedCount++;
+    });
+
     const completionPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
     return {
@@ -348,11 +384,11 @@ export default function App() {
       paidAmount: paidVal,
       pendingAmount: pendingVal,
       overdueAmount: overdueVal,
-      count: totalCount,
-      completedCount: completedCount,
-      percent: completionPercent
+      percent: completionPercent,
+      completedCount,
+      count: totalCount
     };
-  }, [bills]);
+  }, [bills, expenses]);
 
   // Filter bills list based on state search filters
   const filteredBills = useMemo(() => {
@@ -698,14 +734,16 @@ export default function App() {
   };
 
   const contextValue = {
-    bills, userProfile, stats, currencySymbol, categoryChartStats,
+    bills, expenses, userProfile, stats, currencySymbol, categoryChartStats,
     triggerAddFlow, triggerEditFlow, handleToggleState, handleDeleteTrigger, triggerCallAI,
     searchQuery, setSearchQuery, categoryFilter, setCategoryFilter, statusFilter, setStatusFilter,
     aiTip, isGeneratingTip, calendarYear, calendarMonth, handlePrevMonth, handleNextMonth,
     calendarCells, monthNames, getCategoryLabel, getStatusColor,
     setCurrentTab: () => {}, userEmail: firebaseUser?.email || '', handleUpdatePreference, setUserProfile,
     filteredBills,
-    handleExportCSV
+    handleExportCSV,
+    handleLoadDemoData,
+    isGeneratingDemo
   };
   if (authLoading) {
     return (
@@ -1096,6 +1134,13 @@ export default function App() {
                 <Receipt className="w-5 h-5 text-current" />
                 Bills Management
               </button>
+              <button 
+                onClick={() => { navigate('/expenses'); setIsSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/expenses' ? 'text-[#005d42] bg-[#f0f5f0] font-bold border-r-4 border-[#005d42]' : 'text-[#3e4943] hover:bg-slate-50'}`}
+              >
+                <Wallet className="w-5 h-5 text-current" />
+                Personal Expenses
+              </button>
 
               <button 
                 onClick={() => { navigate('/calendar'); setIsSidebarOpen(false); }}
@@ -1114,7 +1159,15 @@ export default function App() {
               </button>
             </div>
 
-            <div className="mt-auto pt-6 border-t border-[#ebefea]">
+            <div className="mt-auto pt-6 border-t border-[#ebefea] space-y-1">
+              <button 
+                onClick={() => { navigate('/about'); setIsSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/about' ? 'text-[#005d42] bg-[#f0f5f0] font-bold border-r-4 border-[#005d42]' : 'text-[#3e4943] hover:bg-slate-50'}`}
+              >
+                <Info className="w-5 h-5 text-current" />
+                About
+              </button>
+
               <button 
                 onClick={() => triggerAddFlow()}
                 className="w-full flex items-center justify-center gap-2 bg-[#047857] hover:bg-[#065F46] text-white py-2.5 rounded-xl font-medium text-sm transition-colors shadow-sm mb-4"
@@ -1258,11 +1311,16 @@ export default function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
 {/* TAB 2: BILLS MANAGEMENT TABLE VIEW */}
                 <Route path="/bills" element={<Bills />} />
+                <Route path="/expenses" element={<Expenses />} />
 {/* TAB 3: CALENDAR VIEW */}
                 <Route path="/calendar" element={<Calendar />} />
 {/* TAB 4: FINANCIAL INSIGHTS SECTION */}
                 <Route path="/insights" element={<Insights />} />
+{/* TAB 5: ABOUT SECTION */}
+                <Route path="/about" element={<About />} />
                   </Routes>
+                  
+                  <WhatsNewModal />
                 </AppContext.Provider>
 
               </div>

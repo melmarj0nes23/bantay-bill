@@ -13,7 +13,7 @@ import { useAppContext } from '../context/AppContext';
 import { getBillsForMonth, computeStats } from '../utils/billCalculations';
 
 export default function Insights() {
-  const { bills, currencySymbol, monthNames, getCategoryLabel, getStatusColor } = useAppContext();
+  const { bills, expenses, currencySymbol, monthNames, getCategoryLabel, getStatusColor } = useAppContext();
   
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
@@ -33,13 +33,20 @@ export default function Insights() {
     return monthNames.map((monthName, index) => {
       const monthNumber = index + 1; // 1-indexed
       const monthBills = getBillsForMonth(bills, selectedYear, monthNumber);
-      const stats = computeStats(monthBills);
+      
+      const monthExpenses = expenses.filter(e => {
+        const [eYear, eMonth] = e.date.split('-').map(Number);
+        return eYear === selectedYear && eMonth === monthNumber;
+      });
+
+      const stats = computeStats(monthBills, monthExpenses);
       
       return {
         index,
         monthNumber,
         monthName,
         bills: monthBills,
+        expenses: monthExpenses,
         stats
       };
     });
@@ -48,15 +55,28 @@ export default function Insights() {
   // Aggregate yearly totals
   const yearlyStats = useMemo(() => {
     let total = 0, paid = 0, pending = 0;
+    let billsTotal = 0, billsPaid = 0, billsPending = 0;
+    let expensesTotal = 0;
+
     monthsData.forEach(m => {
       total += m.stats.totalAmount;
       paid += m.stats.paidAmount;
       pending += (m.stats.pendingAmount + m.stats.overdueAmount);
+      
+      billsTotal += m.stats.billsTotalAmount;
+      billsPaid += (m.stats.paidAmount - m.stats.expensesTotalAmount);
+      billsPending += (m.stats.pendingAmount + m.stats.overdueAmount);
+
+      expensesTotal += m.stats.expensesTotalAmount;
     });
     return {
       total,
       paid,
       pending,
+      billsTotal,
+      billsPaid,
+      billsPending,
+      expensesTotal,
       percent: total > 0 ? Math.round((paid / total) * 100) : 0
     };
   }, [monthsData]);
@@ -94,44 +114,32 @@ export default function Insights() {
 
       {/* Yearly Aggregation Card */}
       <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm flex flex-col md:flex-row gap-6 items-center">
-        <div className="flex-1 w-full">
-          <h3 className="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider">Total {selectedYear} Spend</h3>
-          <div className="text-3xl font-bold text-[#181d1a]">{currencySymbol}{yearlyStats.total.toLocaleString()}</div>
-          <div className="flex gap-4 mt-3">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#005d42]">
-              <CheckCircle className="w-4 h-4" /> Paid: {currencySymbol}{yearlyStats.paid.toLocaleString()}
+        <div className="flex-1 w-full flex flex-col sm:flex-row gap-6">
+          <div className="flex-1 border-b sm:border-b-0 sm:border-r border-slate-200 pb-4 sm:pb-0 sm:pr-6">
+            <h3 className="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider">Total Bills Spend</h3>
+            <div className="text-3xl font-bold text-[#181d1a]">{currencySymbol}{yearlyStats.billsTotal.toLocaleString()}</div>
+            <div className="flex gap-4 mt-3">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#005d42]">
+                <CheckCircle className="w-4 h-4" /> Paid: {currencySymbol}{yearlyStats.billsPaid.toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
+                <Clock className="w-4 h-4" /> Pending: {currencySymbol}{yearlyStats.billsPending.toLocaleString()}
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
-              <Clock className="w-4 h-4" /> Pending: {currencySymbol}{yearlyStats.pending.toLocaleString()}
+          </div>
+          
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider">Total Expenses Spend</h3>
+            <div className="text-3xl font-bold text-[#181d1a]">{currencySymbol}{yearlyStats.expensesTotal.toLocaleString()}</div>
+            <div className="flex gap-4 mt-3">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#005d42]">
+                <CheckCircle className="w-4 h-4" /> Paid: {currencySymbol}{yearlyStats.expensesTotal.toLocaleString()}
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Progress Circle for the Year */}
-        <div className="relative flex items-center justify-center shrink-0 w-24 h-24">
-          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-            <path
-              className="text-slate-100"
-              strokeWidth="3.5"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-            <path
-              className="text-[#005d42] transition-all duration-1000 ease-out"
-              strokeDasharray={`${yearlyStats.percent}, 100`}
-              strokeWidth="3.5"
-              strokeLinecap="round"
-              stroke="currentColor"
-              fill="none"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-          </svg>
-          <div className="absolute flex flex-col items-center justify-center text-center">
-            <span className="text-sm font-bold text-[#181d1a] leading-none">{yearlyStats.percent}%</span>
-          </div>
-        </div>
+
       </div>
 
       {/* Monthly Cards List */}
@@ -149,7 +157,7 @@ export default function Insights() {
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-[#181d1a] group-hover:text-[#005d42] transition-colors">{data.monthName} {selectedYear}</h3>
-                  <p className="text-xs text-slate-500 font-medium">{data.bills.length} bills scheduled</p>
+                  <p className="text-xs text-slate-500 font-medium">{data.bills.length + data.expenses.length} records ({data.bills.length} bills, {data.expenses.length} expenses)</p>
                 </div>
               </div>
               
@@ -180,15 +188,15 @@ export default function Insights() {
             {/* Expandable Bill List */}
             {expandedMonth === data.index && (
               <div className="border-t border-slate-100 bg-slate-50/50 p-5">
-                {data.bills.length === 0 ? (
+                {data.bills.length === 0 && data.expenses.length === 0 ? (
                   <div className="text-center py-6 text-slate-400 text-xs">
                     <Receipt className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    No bills recorded for this month.
+                    No bills or expenses recorded for this month.
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {data.bills.map((bill) => (
-                      <div key={`${bill.id}-${bill.dueDate}`} className="bg-white border border-slate-200 rounded-xl p-3 flex justify-between items-center shadow-xs">
+                      <div key={`bill-${bill.id}-${bill.dueDate}`} className="bg-white border border-slate-200 rounded-xl p-3 flex justify-between items-center shadow-xs">
                         <div>
                           <div className="flex items-center gap-2 mb-0.5">
                             <span className="font-bold text-sm text-slate-800">{bill.name}</span>
@@ -204,6 +212,26 @@ export default function Insights() {
                         </div>
                         <div className="font-extrabold text-slate-800 text-sm">
                           {currencySymbol}{bill.amount.toLocaleString()}
+                        </div>
+                      </div>
+                    ))}
+                    {data.expenses.map((expense) => (
+                      <div key={`exp-${expense.id}-${expense.date}`} className="bg-white border border-slate-200 rounded-xl p-3 flex justify-between items-center shadow-xs">
+                        <div>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="font-bold text-sm text-slate-800">{expense.name}</span>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700">
+                              Paid (Expense)
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+                            <span className="capitalize">{expense.category}</span>
+                            <span>•</span>
+                            <span>Date: {expense.date}</span>
+                          </div>
+                        </div>
+                        <div className="font-extrabold text-slate-800 text-sm">
+                          {currencySymbol}{expense.amount.toLocaleString()}
                         </div>
                       </div>
                     ))}

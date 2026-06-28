@@ -13,6 +13,15 @@ export interface Bill {
   notes: string;
 }
 
+export interface Expense {
+  id: string;
+  name: string;
+  category: 'food' | 'transport' | 'shopping' | 'entertainment' | 'health' | 'education' | 'other';
+  amount: number;
+  date: string; // YYYY-MM-DD
+  notes: string;
+}
+
 export interface UserProfile {
   fullName: string;
   email: string;

@@ -11,7 +11,7 @@ import { getBillsForMonth, computeStats } from '../utils/billCalculations';
 export default function Dashboard() {
   const navigate = useNavigate();
   const { 
-    bills, userProfile, currencySymbol,
+    bills, expenses, userProfile, currencySymbol,
     triggerAddFlow, triggerEditFlow, handleToggleState, triggerCallAI,
     aiTip, isGeneratingTip, getCategoryLabel
   } = useAppContext();
@@ -27,6 +27,18 @@ export default function Dashboard() {
       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     });
   }, [bills, selectedDate]);
+
+
+  const dashboardExpenses = useMemo(() => {
+    return expenses.filter(e => {
+      const eDate = new Date(e.date);
+      return eDate.getFullYear() === selectedDate.getFullYear() && eDate.getMonth() === selectedDate.getMonth();
+    });
+  }, [expenses, selectedDate]);
+
+  const expensesTotalAmount = useMemo(() => {
+    return dashboardExpenses.reduce((sum, e) => sum + e.amount, 0);
+  }, [dashboardExpenses]);
 
 
   const dashboardCalendarCells = useMemo(() => {
@@ -60,6 +72,8 @@ export default function Dashboard() {
     return computeStats(dashboardBills);
   }, [dashboardBills]);
 
+  const totalOutflow = dashboardStats.totalAmount + expensesTotalAmount;
+
   // Generate options for the next 12 months, and past 6 months
   const monthOptions = useMemo(() => {
     const opts = [];
@@ -76,14 +90,18 @@ export default function Dashboard() {
   const dailySpend = useMemo(() => {
     return Array.from({ length: daysInMonth }, (_, i) => {
       const day = i + 1;
-      const amount = dashboardBills.reduce((sum, b) => {
+      const billAmount = dashboardBills.reduce((sum, b) => {
         const bDay = parseInt(b.dueDate.split('-')[2], 10);
         return bDay === day ? sum + b.amount : sum;
       }, 0);
-      return amount;
+      const expenseAmount = dashboardExpenses.reduce((sum, e) => {
+        const eDay = parseInt(e.date.split('-')[2], 10);
+        return eDay === day ? sum + e.amount : sum;
+      }, 0);
+      return { billAmount, expenseAmount, total: billAmount + expenseAmount };
     });
-  }, [dashboardBills, daysInMonth]);
-  const maxSpend = Math.max(...dailySpend, 1);
+  }, [dashboardBills, dashboardExpenses, daysInMonth]);
+  const maxSpend = Math.max(...dailySpend.map(d => d.total), 1);
 
   // Helper for Category Icons
   const getCategoryIcon = (category: string) => {
@@ -166,52 +184,36 @@ export default function Dashboard() {
       {/* STATS ROW */}
       <div className="order-3 grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Total Spent */}
+        {/* Total Bills */}
         <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-sm font-bold text-slate-500">Total Spent</span>
-            <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">+5%</span>
+            <span className="text-sm font-bold text-slate-500">Total Bills</span>
+            <span className="p-1.5 bg-blue-50 text-blue-500 rounded-lg"><Receipt className="w-4 h-4" /></span>
           </div>
           <div className="text-4xl font-black text-slate-800 tracking-tight">
             {currencySymbol}{dashboardStats.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
 
-        {/* Pending Bills */}
+        {/* Total Expenses */}
         <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-sm font-bold text-slate-500">Pending Bills</span>
+            <span className="text-sm font-bold text-slate-500">Personal Expenses</span>
             <span className="p-1.5 bg-orange-50 text-orange-500 rounded-lg"><Clock className="w-4 h-4" /></span>
           </div>
-          <div className="flex items-end justify-between">
-            <div className="text-4xl font-black text-slate-800 tracking-tight">
-              {dashboardBills.filter(b => b.status !== 'Paid').length}
-            </div>
-            <div className="text-sm font-bold text-slate-500 pb-1">
-              {currencySymbol}{dashboardStats.pendingAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </div>
+          <div className="text-4xl font-black text-slate-800 tracking-tight">
+            {currencySymbol}{expensesTotalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
 
-        {/* Progress / Savings Goal */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all relative overflow-hidden">
-          <div className="absolute right-[-20px] bottom-[-20px] opacity-5 pointer-events-none">
-            <CheckCircle className="w-32 h-32 text-emerald-500" />
-          </div>
+        {/* Total Outflow */}
+        <div className="bg-gradient-to-br from-[#005d42] to-[#047857] rounded-3xl p-6 border border-[#005d42] shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col justify-between transition-all relative overflow-hidden">
           <div className="flex justify-between items-start mb-4 relative z-10">
-            <span className="text-sm font-bold text-slate-500">Cycle Completion</span>
-            <span className="text-sm font-bold text-slate-400">{dashboardStats.percent}%</span>
+            <span className="text-sm font-bold text-emerald-100">Total Outflow</span>
           </div>
           <div className="relative z-10">
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-black text-[#005d42]">{currencySymbol}{dashboardStats.paidAmount.toLocaleString()}</span>
-              <span className="text-sm font-bold text-slate-400">/{currencySymbol}{dashboardStats.totalAmount.toLocaleString()}</span>
-            </div>
-            <div className="w-full bg-slate-100 rounded-full h-2 mt-4 overflow-hidden">
-              <div 
-                className="bg-[#005d42] h-2 rounded-full transition-all duration-1000 ease-out" 
-                style={{ width: `${dashboardStats.percent}%` }}
-              ></div>
+            <div className="text-4xl font-black text-white tracking-tight">
+              {currencySymbol}{totalOutflow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
         </div>
@@ -226,8 +228,8 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-8">
             <h3 className="font-bold text-lg text-slate-800">Monthly Spending</h3>
             <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-              <span className="w-2 h-2 rounded-full bg-[#005d42]"></span> Current Spend
-              <span className="ml-2 text-slate-800">{currencySymbol}{dashboardStats.totalAmount.toLocaleString()}</span>
+              <span className="w-2 h-2 rounded-full bg-[#005d42]"></span> Bills <span className="w-2 h-2 rounded-full bg-orange-400 ml-2"></span> Expenses
+              <span className="ml-2 text-slate-800">{currencySymbol}{totalOutflow.toLocaleString()}</span>
             </div>
           </div>
           
@@ -240,19 +242,22 @@ export default function Dashboard() {
             </div>
             
             <div className="flex-1 flex items-end justify-between ml-12 h-[120px] border-b border-slate-100 pb-1">
-              {dailySpend.map((amount, idx) => (
+              {dailySpend.map((dayData, idx) => (
                 <div key={idx} className="relative w-full h-full flex items-end justify-center group">
-                  {amount > 0 && (
-                    <div 
-                      className="w-[80%] max-w-[12px] bg-[#005d42] rounded-t-sm hover:bg-[#065F46] transition-colors cursor-pointer"
-                      style={{ height: `${(amount / maxSpend) * 100}%`, minHeight: '4px' }}
-                    >
-                       <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded shadow pointer-events-none z-10 whitespace-nowrap">
-                         {currencySymbol}{amount}
+                  {dayData.total > 0 && (
+                    <div className="w-[80%] max-w-[12px] flex flex-col justify-end cursor-pointer" style={{ height: `${(dayData.total / maxSpend) * 100}%`, minHeight: '4px' }}>
+                      {dayData.expenseAmount > 0 && (
+                         <div className="w-full bg-orange-400 rounded-t-sm hover:bg-orange-500 transition-colors" style={{ height: `${(dayData.expenseAmount / dayData.total) * 100}%` }}></div>
+                      )}
+                      {dayData.billAmount > 0 && (
+                         <div className={`w-full bg-[#005d42] hover:bg-[#065F46] transition-colors ${dayData.expenseAmount === 0 ? 'rounded-t-sm' : ''}`} style={{ height: `${(dayData.billAmount / dayData.total) * 100}%` }}></div>
+                      )}
+                       <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded shadow pointer-events-none z-20 whitespace-nowrap flex flex-col items-center">
+                         <span>{currencySymbol}{dayData.total}</span>
                        </div>
                     </div>
                   )}
-                  {amount === 0 && (
+                  {dayData.total === 0 && (
                      <div className="w-[80%] max-w-[12px] bg-slate-100 rounded-t-sm" style={{ height: '4px' }}></div>
                   )}
                 </div>

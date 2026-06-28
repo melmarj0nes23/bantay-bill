@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Plus, Trash2, ReceiptText, Coffee, Car, ShoppingBag, Clapperboard, HeartPulse, GraduationCap, Box } from 'lucide-react';
+import { Plus, Trash2, ReceiptText, Coffee, Car, ShoppingBag, Clapperboard, HeartPulse, GraduationCap, Box, Pencil } from 'lucide-react';
 import { addExpenseInDb, deleteExpenseFromDb, updateExpenseInDb } from '../firebaseService';
 import { auth } from '../firebase';
 
 export default function Expenses() {
-  const { expenses, userEmail, currencySymbol } = useAppContext();
+  const { expenses, userEmail, currencySymbol, handleLoadDemoData, isGeneratingDemo } = useAppContext();
   const [isAdding, setIsAdding] = useState(false);
   
   const [name, setName] = useState('');
@@ -36,31 +36,35 @@ export default function Expenses() {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
 
-    if (editingId) {
-      await updateExpenseInDb(editingId, {
-        name,
-        amount: parseFloat(amount),
-        category,
-        date,
-        notes
-      });
-      setEditingId(null);
-    } else {
-      await addExpenseInDb(uid, {
-        name,
-        amount: parseFloat(amount),
-        category,
-        date,
-        notes
-      });
+    try {
+      if (editingId) {
+        await updateExpenseInDb(editingId, {
+          name,
+          amount: parseFloat(amount),
+          category,
+          date,
+          notes
+        });
+        setEditingId(null);
+      } else {
+        await addExpenseInDb(uid, {
+          name,
+          amount: parseFloat(amount),
+          category,
+          date,
+          notes
+        });
+      }
+      
+      // Reset form
+      setName('');
+      setAmount('');
+      setNotes('');
+      setDate(new Date().toISOString().split('T')[0]);
+      setIsAdding(false);
+    } catch (err: any) {
+      alert("Failed to save expense: " + err.message);
     }
-    
-    // Reset form
-    setName('');
-    setAmount('');
-    setNotes('');
-    setDate(new Date().toISOString().split('T')[0]);
-    setIsAdding(false);
   };
 
   const handleEdit = (exp: any) => {
@@ -152,34 +156,121 @@ export default function Expenses() {
           <div className="py-16 text-center text-slate-500 flex flex-col items-center">
             <ReceiptText className="w-12 h-12 text-slate-300 mb-3" />
             <p className="font-semibold text-slate-600">No expenses recorded yet.</p>
-            <p className="text-sm">Start tracking your daily spending to get better insights.</p>
+            <p className="text-sm mb-6">Start tracking your daily spending to get better insights.</p>
+            {expenses.length === 0 && (
+              <button 
+                onClick={handleLoadDemoData}
+                disabled={isGeneratingDemo}
+                className="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium px-4 py-2 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-colors text-sm disabled:opacity-50"
+              >
+                {isGeneratingDemo ? (
+                  <>
+                    <div className="w-4 h-4 rounded-full border-2 border-slate-300 border-t-slate-600 animate-spin"></div>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <ReceiptText className="w-4 h-4 text-slate-500" />
+                    Load Demo Data
+                  </>
+                )}
+              </button>
+            )}
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {expenses.map((exp) => (
-              <div 
-                key={exp.id} 
-                onClick={() => handleEdit(exp)}
-                className="flex items-center p-4 hover:bg-slate-50 transition-colors cursor-pointer group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mr-4">
-                  {getCategoryIcon(exp.category)}
+            {/* Desktop Table View */}
+            <div className="overflow-x-auto hidden md:block">
+              <table className="w-full min-w-[700px] text-xs whitespace-nowrap">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <th className="py-3 px-4 text-center"></th>
+                    <th className="py-3 px-4 text-left">Name</th>
+                    <th className="py-3 px-4 text-left">Date</th>
+                    <th className="py-3 px-4 text-left">Category</th>
+                    <th className="py-3 px-4 text-right">Amount</th>
+                    <th className="py-3 px-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {expenses.map((exp) => (
+                    <tr key={exp.id} className="hover:bg-slate-50/50 transition-all group">
+                      <td className="py-3 px-4">
+                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto">
+                          {getCategoryIcon(exp.category)}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 text-left font-bold text-slate-800">
+                        {exp.name}
+                      </td>
+                      <td className="py-3.5 px-4 text-left text-slate-600 font-medium">
+                        {exp.date}
+                      </td>
+                      <td className="py-3.5 px-4 text-left">
+                        <span className="text-xs font-medium bg-slate-100 px-2.5 py-1 rounded-md capitalize text-slate-600">
+                          {exp.category}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right font-bold text-slate-800">
+                        {currencySymbol}{exp.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <button 
+                            onClick={() => handleEdit(exp)}
+                            title="Edit Expense"
+                            className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={(e) => handleDelete(exp.id, e)}
+                            title="Delete Expense"
+                            className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors md:opacity-0 md:group-hover:opacity-100"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View */}
+            <div className="md:hidden divide-y divide-slate-100">
+              {expenses.map((exp) => (
+                <div key={exp.id} className="flex flex-col p-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center w-full mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mr-4 shrink-0">
+                      {getCategoryIcon(exp.category)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-slate-800 truncate">{exp.name}</p>
+                      <p className="text-xs text-slate-500 capitalize">{exp.category} • {exp.date}</p>
+                    </div>
+                    <div className="text-right ml-4">
+                      <p className="font-bold text-slate-800">{currencySymbol}{exp.amount.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
+                    <button 
+                      onClick={() => handleEdit(exp)}
+                      className="flex-1 py-2 text-center text-xs font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={(e) => handleDelete(exp.id, e)}
+                      className="flex-1 py-2 text-center text-xs font-bold text-rose-600 bg-rose-50 rounded-lg hover:bg-rose-100 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-slate-800 truncate">{exp.name}</p>
-                  <p className="text-xs text-slate-500 capitalize">{exp.category} • {exp.date}</p>
-                </div>
-                <div className="text-right ml-4 mr-4">
-                  <p className="font-bold text-slate-800">{currencySymbol}{exp.amount.toLocaleString()}</p>
-                </div>
-                <button 
-                  onClick={(e) => handleDelete(exp.id, e)}
-                  className="p-2 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100 md:block hidden"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </div>

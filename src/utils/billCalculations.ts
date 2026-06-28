@@ -1,4 +1,4 @@
-import { Bill } from '../types';
+import { Bill, Expense } from '../types';
 
 /**
  * Helper to compute the dynamic status of a bill for a specific occurrence date.
@@ -98,18 +98,28 @@ export function getBillsForMonth(bills: Bill[], cYear: number, cMonth: number): 
   return matched;
 }
 
-export function computeStats(bills: Bill[]) {
+export function computeStats(bills: Bill[], expenses: Expense[] = []) {
   let total = 0, paid = 0, pending = 0, overdue = 0;
+  let billsTotalAmount = 0;
+  let expensesTotalAmount = 0;
+
   bills.forEach(b => {
     total += b.amount;
+    billsTotalAmount += b.amount;
     if (b.status === 'Paid') paid += b.amount;
     if (b.status === 'Upcoming' || b.status === 'Due Soon') pending += b.amount;
     if (b.status === 'Overdue') overdue += b.amount;
   });
+  expenses.forEach(e => {
+    total += e.amount;
+    expensesTotalAmount += e.amount;
+    paid += e.amount;
+  });
   return {
     totalAmount: total, paidAmount: paid, pendingAmount: pending, overdueAmount: overdue,
+    billsTotalAmount, expensesTotalAmount,
     percent: total > 0 ? Math.round((paid / total) * 100) : 0,
-    completedCount: bills.filter(b => b.status === 'Paid').length,
-    count: bills.length
+    completedCount: bills.filter(b => b.status === 'Paid').length + expenses.length,
+    count: bills.length + expenses.length
   };
 }

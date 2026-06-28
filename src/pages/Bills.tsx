@@ -111,39 +111,41 @@ export default function Bills() {
                         <>
                           {/* Desktop Table View */}
                           <div className="overflow-x-auto hidden md:block">
-                            <table className="w-full text-left text-xs whitespace-nowrap">
+                            <table className="w-full min-w-[900px] text-xs whitespace-nowrap">
                               <thead>
-                                <tr className="bg-slate-50 border-b border-[#ebefea] text-slate-400 font-semibold uppercase tracking-wider">
-                                  <th className="py-3 px-4">Bill Name</th>
-                                  <th className="py-3 px-4">Category</th>
+                                <tr className="bg-slate-50/80 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                  <th className="py-3 px-4 text-left">Name</th>
+                                  <th className="py-3 px-4 text-left">Due Date</th>
+                                  <th className="py-3 px-4 text-left">Category</th>
                                   <th className="py-3 px-4 text-right">Amount</th>
-                                  <th className="py-3 px-4">Due Date</th>
                                   <th className="py-3 px-4 text-center">Status</th>
-                                  <th className="py-3 px-4">Notes</th>
+                                  <th className="py-3 px-4 text-left">Notes</th>
                                   <th className="py-3 px-4 text-center">Actions</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-slate-100">
                                 {filteredBills.map((bill) => (
                                   <tr key={bill.id} className="hover:bg-slate-50/50 transition-all">
-                                    <td className="py-3.5 px-4 font-semibold text-slate-800">
+                                    <td className="py-3.5 px-4 text-left font-bold text-slate-800">
                                       {bill.name}
                                     </td>
-                                    <td className="py-3.5 px-4 text-slate-500 font-medium capitalize">
-                                      {getCategoryLabel(bill.category)}
+                                    <td className="py-3.5 px-4 text-left text-slate-600 font-medium">
+                                      {bill.dueDate}
+                                    </td>
+                                    <td className="py-3.5 px-4 text-left text-slate-600">
+                                      <span className="text-xs font-medium bg-slate-100 px-2.5 py-1 rounded-md capitalize text-slate-600">
+                                        {getCategoryLabel(bill.category)}
+                                      </span>
                                     </td>
                                     <td className="py-3.5 px-4 text-right font-bold text-slate-800">
-                                      {currencySymbol}{bill.amount.toLocaleString()}
-                                    </td>
-                                    <td className="py-3.5 px-4 text-slate-600 font-mono">
-                                      {bill.dueDate}
+                                      {currencySymbol}{bill.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                     <td className="py-3.5 px-4 text-center">
                                       <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${getStatusColor(bill.status)}`}>
                                         {bill.status}
                                       </span>
                                     </td>
-                                    <td className="py-3.5 px-4 text-slate-500 font-medium max-w-[200px] truncate">
+                                    <td className="py-3.5 px-4 text-left text-slate-500 font-medium max-w-[200px] truncate">
                                       {bill.notes || '—'}
                                     </td>
                                     <td className="py-3.5 px-4 text-center">

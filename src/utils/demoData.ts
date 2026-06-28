@@ -1,5 +1,5 @@
-import { addBillInDb } from '../firebaseService';
-import { Bill } from '../types';
+import { addBillInDb, addExpenseInDb } from '../firebaseService';
+import { Bill, Expense } from '../types';
 
 export const loadDemoData = async (userId: string) => {
   const now = new Date();
@@ -125,6 +125,60 @@ export const loadDemoData = async (userId: string) => {
     }
   ];
 
-  const promises = demoBills.map(bill => addBillInDb(userId, bill));
-  await Promise.all(promises);
+  const demoExpenses: Omit<Expense, 'id'>[] = [
+    {
+      name: 'Jollibee Delivery',
+      amount: 450,
+      date: getRelativeDate(-1),
+      category: 'food',
+      notes: 'Demo Data: Late night snack.'
+    },
+    {
+      name: 'Grab Ride to Office',
+      amount: 320,
+      date: getRelativeDate(0),
+      category: 'transport',
+      notes: 'Demo Data: Morning commute rush.'
+    },
+    {
+      name: 'Uniqlo Shirts',
+      amount: 1980,
+      date: getRelativeDate(-3),
+      category: 'shopping',
+      notes: 'Demo Data: Office wear update.'
+    },
+    {
+      name: 'SM Cinema Tickets',
+      amount: 700,
+      date: getRelativeDate(-5),
+      category: 'entertainment',
+      notes: 'Demo Data: Weekend movie.'
+    },
+    {
+      name: 'Mercury Drug',
+      amount: 550,
+      date: getRelativeDate(-2),
+      category: 'health',
+      notes: 'Demo Data: Vitamins and supplements.'
+    },
+    {
+      name: 'Coursera Subscription',
+      amount: 2500,
+      date: getRelativeDate(-10),
+      category: 'education',
+      notes: 'Demo Data: Monthly learning.'
+    },
+    {
+      name: 'Coffee Shop Meeting',
+      amount: 350,
+      date: getRelativeDate(-4),
+      category: 'food',
+      notes: 'Demo Data: Client sync.'
+    }
+  ];
+
+  const billPromises = demoBills.map(bill => addBillInDb(userId, bill));
+  const expensePromises = demoExpenses.map(exp => addExpenseInDb(userId, exp));
+  
+  await Promise.all([...billPromises, ...expensePromises]);
 };
